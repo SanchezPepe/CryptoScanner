@@ -42,7 +42,7 @@ def reqAPI():
 
 def refreshData():
     #API REQUEST
-    lenDic, coc, last, volC = 0, 0, 0, 0
+    lenDic, coc, last, volC, bVol = 0, 0, 0, 0, 0
     ask, bid, spread = 0, 0, 0
     old, recent = 0, 0
     coins = reqAPI()
@@ -64,7 +64,8 @@ def refreshData():
         changeDic = {'last':y['LastPrice'],
                      'sprd':spread,
                      'chng':y['Change'],
-                    'vol': (0, y['Volume'])}
+                    'vol': (0, y['Volume']),
+                    'buyVol': (0, y['BuyVolume'])}
         if lenDic != 0: #Si hay registros de precios
             #Cambio
             recent = [*dic[name]][lenDic-1] #Compara con el más reciente
@@ -80,6 +81,16 @@ def refreshData():
                 volC = 0
             else:
                 volC = 1
+            #BuyVolume
+            last = dic[name][recent]['buyVol'][1] # (    ,****) 
+            changeDic['buyVol'] = (last, y['BuyVolume'])
+            if last != 0:
+                bVol = round(y['BuyVolume']/last-1, 2)
+            elif y['BuyVolume'] == 0:
+                bVol = 0
+            else:
+                bVol = 1
+            changeDic['buyVol'] = bVol
             changeDic['coc'] = coc
             changeDic['volC'] = volC
             if coc > 0.0 and volC > 0.025: #Si el cambio en precios o en volumen es mayor al 5%
