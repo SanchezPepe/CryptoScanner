@@ -17,6 +17,7 @@ from IPython.display import clear_output
 
 
 # In[2]:
+pp = pprint.PrettyPrinter(indent=1)
 
 
 def clear():
@@ -50,7 +51,6 @@ def refreshData():
         coins = reqAPI()
         print(type(coins))
     for y in coins:
-        subDic = {}
         changeDic = {}
         name = y['Label']
         if name in dic:
@@ -62,8 +62,8 @@ def refreshData():
             spread = ((y['AskPrice']/y['BidPrice'])-1)*100
             spread = round(spread, 2)
         changeDic = {'last':y['LastPrice'],
-                     'sprd':spread,
-                     'chng':y['Change'],
+                    'sprd':spread,
+                    'chng':y['Change'],
                     'vol': (0, y['Volume']),
                     'buyVol': (0, y['BuyVolume'])}
         if lenDic != 0: #Si hay registros de precios
@@ -82,7 +82,7 @@ def refreshData():
             else:
                 volC = 1
             #BuyVolume
-            last = dic[name][recent]['buyVol'][1] # (    ,****) 
+            last = dic[name][recent]['buyVol'][1] #(    ,****) 
             changeDic['buyVol'] = (last, y['BuyVolume'])
             if last != 0:
                 bVol = round(y['BuyVolume']/last-1, 2)
@@ -90,10 +90,10 @@ def refreshData():
                 bVol = 0
             else:
                 bVol = 1
-            changeDic['buyVol'] = bVol
+            changeDic['bvc'] = bVol
             changeDic['coc'] = coc
             changeDic['volC'] = volC
-            if coc > 0.0 and volC > 0.025: #Si el cambio en precios o en volumen es mayor al 5%
+            if coc > 0.05 or volC > 0.025 or bVol > 0.02 : #Si el cambio en precios o en volumen es mayor al 5%
                 if not name in toBuy:
                     toBuy[name] = {}
                 toBuy[name][ts] = changeDic
@@ -110,7 +110,6 @@ def refreshData():
 #Variables
 #Diccionarios con los datos
 def analiza(n):
-    pp = pprint.PrettyPrinter(indent=1)
     i = 0
     suma = 0
     toBuySize = 0
