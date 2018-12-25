@@ -93,7 +93,7 @@ def refreshData():
             changeDic['bvc'] = bVol
             changeDic['coc'] = coc
             changeDic['volC'] = volC
-            if coc > 0.05 or volC > 0.025 or bVol > 0.02 : #Si el cambio en precios o en volumen es mayor al 5%
+            if coc > 0.05 or volC > 0.05 or bVol > 0.05 : #Si el cambio en precios o en volumen es mayor al 5%
                 if not name in toBuy:
                     toBuy[name] = {}
                 toBuy[name][ts] = changeDic
