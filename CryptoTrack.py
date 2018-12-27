@@ -118,51 +118,6 @@ def refreshData():
 # In[5]:
 
 
-#Variables
-#Diccionarios con los datos
-def analiza(n):
-    i = 0
-    suma = 0
-    toBuySize = 0
-    while i < n:
-        start = time.time()
-        refreshData()
-        end = time.time()
-        suma += end-start
-        if toBuySize < len(toBuy): #Si se agregó un nvo item a toBuy
-            #clear()
-            clear_output()
-            #plotChanges()
-            #pp.pprint(toBuy)
-        i += 1
-        toBuySize = len(toBuy)
-        sleep(1.5)
-        
-    #Tiempo promedio por respuesta
-    print('Tiempo promedio de las ejecuciones: ', suma/n)
-
-
-# In[6]:
-
-
-#Coin Analisis
-#pp.pprint(dic)
-#pp.pprint(dic['$$$/BTC'])
-pp = pprint.PrettyPrinter(indent=4)
-dic, toBuy, changeDic = {}, {}, {}
-top = {}
-n = input('Ingresar número de pruebas a ejecutar ')
-if type(n) is str:
-    n = int(n)
-    if n > 0:
-        analiza(n)
-else:
-    print('Ingresa un número mayor a 0')
-
-
-# In[15]:
-
-
 def autolabel(rects, xpos='center'):
     """
     Attach a text label above each bar in *rects*, displaying its height.
@@ -174,44 +129,87 @@ def autolabel(rects, xpos='center'):
     xpos = xpos.lower()  # normalize the case of the parameter
     ha = {'center': 'center', 'right': 'left', 'left': 'right'}
     offset = {'center': 0.5, 'right': 0.57, 'left': 0.43}  # x_txt = x + w*off
-
+    ax = plt.gca()
     for rect in rects:
         height = rect.get_height()
         ax.text(rect.get_x() + rect.get_width()*offset[xpos], 1.01*height,'{}'.format(height), ha=ha[xpos], va='bottom')
 
 
-# In[47]:
+# In[6]:
 
 
-chng, volch, bvolc = [], [], []
+def plotChanges():
+    chng, volch, bvolc = [], [], []
+    for i in top:
+        chng.append(round(top[i][0]*100, 0))
+        volch.append(round(top[i][1]*100, 0))
+        bvolc.append(round(top[i][2]*100, 0))    
 
-for i in top:
-    chng.append(round(top[i][0]*100, 0))
-    volch.append(round(top[i][1]*100, 0))
-    bvolc.append(round(top[i][2]*100, 0))    
+    ind = np.arange(len(chng))  # the x locations for the groups
+    width = 0.25  # the width of the bars
+
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(ind - width, chng, width, color='SkyBlue', label='Change')
+    rects2 = ax.bar(ind, volch, width, color='IndianRed', label='Vol Change')
+    rects3 = ax.bar(ind + width, bvolc, width, color='Green', label='Buy Vol Change')
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Change %')
+    ax.set_title('Cambio en el mercado de cryptos')
+
+    ax.set_xticks(ind)
+    ax.set_xticklabels(list(top.keys()))
+    ax.legend()
+
+    autolabel(rects1, "center")
+    autolabel(rects2, "center")
+    autolabel(rects3, "center")
+
+    plt.grid(True, linewidth=0.25)
+    plt.show()
+
+
+# In[7]:
+
+
+def analiza(n):
+    url = 'https://www.cryptopia.co.nz/Exchange?market='
+    i, suma, toBuySize = 0, 0, 0
+    while i <= n:
+        start = time.time()
+        refreshData()
+        end = time.time()
+        suma += end-start
+        if toBuySize < len(toBuy): #Si se agregó un nvo item a toBuy
+            #clear()
+            clear_output()
+            plotChanges()
+            for x in top:
+                print(url + x.replace('/', '_'))
+            #pp.pprint(toBuy)
+        i += 1
+        toBuySize = len(toBuy)
+        sleep(1.0)
+
     
-ind = np.arange(len(chng))  # the x locations for the groups
-width = 0.25  # the width of the bars
-    
-fig, ax = plt.subplots()
-rects1 = ax.bar(ind - width, chng, width, color='SkyBlue', label='Change')
-rects2 = ax.bar(ind, volch, width, color='IndianRed', label='Vol Change')
-rects3 = ax.bar(ind + width, bvolc, width, color='Green', label='Buy Vol Change')
+    #Tiempo promedio por respuesta
+    print('Tiempo promedio de las ejecuciones: ', suma/n)
 
-# Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel('Change %')
-ax.set_title('Cambio en el mercado de cryptos')
 
-ax.set_xticks(ind)
-ax.set_xticklabels(list(top.keys()))
-ax.legend()
+# In[8]:
 
-autolabel(rects1, "center")
-autolabel(rects2, "center")
-autolabel(rects3, "center")
 
-plt.grid(True, linewidth=0.25)
-plt.show()
+#Coin Analisis
+pp = pprint.PrettyPrinter(indent=4)
+dic, toBuy, changeDic = {}, {}, {}
+top = {}
+n = input('Ingresar número de pruebas a ejecutar ')
+if type(n) is str:
+    n = int(n)
+    if n > 0:
+        analiza(n)
+else:
+    print('Ingresa un número mayor a 0')
 
 
 # In[ ]:
