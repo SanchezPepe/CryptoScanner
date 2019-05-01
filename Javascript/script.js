@@ -5,14 +5,12 @@ var url = "https://api.bittrex.com/api/v1.1/public/getmarketsummaries";
 // JSON OBJECTS
 var eth = [];
 var usdt = [];
-var btc_eth = [];
-var btc_usdt = [];
+var btc = [];
 
 // ÍNDICES
 var eth_index;
 var usdt_index;
-var btc_eth_index;
-var btc_usdt_index;
+var btc_index;
 
 request();
 
@@ -35,38 +33,31 @@ function getPairsBothMarkets(array) {
         if (name.includes("ETH")) {
             eth.push(e);
             pair = name.replace("ETH", "BTC");
-            btc_eth.push(pair);
+            btc.push(pair);
         } else if (name.includes("USDT")) {
             usdt.push(e);
             pair = name.replace("USDT", "BTC");
-            btc_usdt.push(pair);
+            btc.push(pair);
         }
     });
-    var aux_eth = [];
-    var aux_usdt = [];
+    var aux = [];
     array.forEach(element => {
         var name = element.MarketName;
         if (name.includes("BTC")) {
-            if (btc_eth.includes(name)) {
-                aux_eth.push(element);
-            }
-            if (btc_usdt.includes(name)) {
-                aux_usdt.push(element);
-            }
+            if (btc.includes(name))
+                aux.push(element);
         }
     });
-    btc_eth = aux_eth;
-    btc_usdt = aux_usdt;
+    btc = aux;
 
     eth_index = createIndex(eth, "ETH");
     usdt_index = createIndex(usdt, "USDT");
-    btc_eth_index = createIndex(btc_eth, "BTC");
-    btc_usdt_index = createIndex(btc_usdt, "BTC");
+    btc_index = createIndex(btc, "BTC");
 
-    checkMarkets("SC");
+    checkCoinThroughMarkets("SC");
 }
 
-function createIndex(array, coin){
+function createIndex(array, coin) {
     var res = [];
     array.forEach(elem => {
         var name = elem.MarketName.replace(coin + '-', "");
@@ -75,23 +66,20 @@ function createIndex(array, coin){
     return res;
 }
 
-function checkMarkets(mkt){
-    // Para c/u se busca en el índice y se accede al elemento           
-    var index = usdt_index.indexOf(mkt);
-    var usdt_obj = usdt[index];
+function checkCoinThroughMarkets(coin) {
 
-    index = btc_usdt_index.indexOf(mkt);
-    var btc_usdt_obj = btc_usdt[index];
+    var markets = [btc, eth, usdt];
+    var indexes = [btc_index, eth_index, usdt_index];
+    var objects = [null, null, null];
+    var index = 0;
 
-    index = eth_index.indexOf(mkt);
-    var eth_obj = eth[index];
-
-    index = btc_eth_index.indexOf(mkt);
-    var btc_eth_obj = btc_eth[index];
-
-    document.getElementById("a1").innerHTML = JSON.stringify(usdt_obj);  
-    document.getElementById("a2").innerHTML = JSON.stringify(btc_usdt_obj);
-    document.getElementById("a3").innerHTML = JSON.stringify(eth_obj);  
-    document.getElementById("a4").innerHTML = JSON.stringify(btc_eth_obj);  
+    // Para cada uno de los mercados se busca el índice y se guarda el obj
+    for (i = 0; i < markets.length; i++) {
+        index = indexes[i].indexOf(coin);
+        if (index != -1){
+            objects[i] = markets[i][index];
+            document.getElementById("" + i).innerHTML = JSON.stringify(objects[i]);
+        }
+    }
 
 }
