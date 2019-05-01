@@ -6,6 +6,7 @@ var eth = [];
 var usdt = [];
 var btc = [];
 var prices = [];
+var markets;
 
 // ÍNDICES
 var eth_index;
@@ -30,7 +31,7 @@ function getPairsBothMarkets(array) {
     array.forEach(e => {
         var name = e.MarketName;
         var pair;
-        if(name.includes("BTC-ETH") || name.includes("USDT-BTC") || name.includes("USDT-ETH")){
+        if (name.includes("BTC-ETH") || name.includes("USDT-BTC") || name.includes("USDT-ETH")) {
             prices.push(e);
         }
         if (name.includes("ETH")) {
@@ -52,12 +53,13 @@ function getPairsBothMarkets(array) {
         }
     });
     btc = aux;
-
+    markets = [btc, eth, usdt];
     eth_index = createIndex(eth, "ETH");
     usdt_index = createIndex(usdt, "USDT");
     btc_index = createIndex(btc, "BTC");
 
     checkCoinThroughMarkets("SC");
+    checkDifference("SC");
 }
 
 function createIndex(array, coin) {
@@ -70,8 +72,6 @@ function createIndex(array, coin) {
 }
 
 function checkCoinThroughMarkets(coin) {
-
-    var markets = [btc, eth, usdt];
     var indexes = [btc_index, eth_index, usdt_index];
     var objects = [null, null, null];
     var index = 0;
@@ -79,9 +79,33 @@ function checkCoinThroughMarkets(coin) {
     // Para cada uno de los mercados se busca el índice y se guarda el obj
     for (i = 0; i < markets.length; i++) {
         index = indexes[i].indexOf(coin);
-        if (index != -1){
+        if (index != -1) {
             objects[i] = markets[i][index];
             document.getElementById("" + i).innerHTML = JSON.stringify(objects[i]);
         }
     }
+    return objects;
+}
+
+function checkDifference(coin) {
+    var objects = checkCoinThroughMarkets(coin);
+    var USDT_ETH = prices[0].Ask;
+    var BTC_ETH = prices[1].Ask;
+    var USDT_BTC = prices[2].Ask;
+    var BTC_coin = objects[0].Ask;
+    var ETH_coin = objects[1].Ask;
+    var USDT_coin = objects[2].Ask;
+
+    var res = 1;
+ 
+    // Empieza en BTC
+    res = 1 / BTC_coin;
+    // Res en coin y se pasa a ETH
+    res = res * ETH_coin;
+    // Res en ETH y se regresa a Bitcoin
+    res = res * BTC_ETH;
+
+    console.log(res);
+    document.getElementById("3").innerHTML = ("" + res);
+    return res;
 }
