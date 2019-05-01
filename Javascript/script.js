@@ -1,11 +1,11 @@
 // https://api.bittrex.com/api/v1.1/public/getticker?market=BTC-LTC
-
 var url = "https://api.bittrex.com/api/v1.1/public/getmarketsummaries";
 
 // JSON OBJECTS
 var eth = [];
 var usdt = [];
 var btc = [];
+var prices = [];
 
 // ÍNDICES
 var eth_index;
@@ -29,7 +29,10 @@ function request() {
 function getPairsBothMarkets(array) {
     array.forEach(e => {
         var name = e.MarketName;
-        var pair = "";
+        var pair;
+        if(name.includes("BTC-ETH") || name.includes("USDT-BTC") || name.includes("USDT-ETH")){
+            prices.push(e);
+        }
         if (name.includes("ETH")) {
             eth.push(e);
             pair = name.replace("ETH", "BTC");
@@ -81,5 +84,4 @@ function checkCoinThroughMarkets(coin) {
             document.getElementById("" + i).innerHTML = JSON.stringify(objects[i]);
         }
     }
-
 }
