@@ -1,5 +1,5 @@
-// https://api.bittrex.com/api/v1.1/public/getticker?market=BTC-LTC
 var url = "https://api.bittrex.com/api/v1.1/public/getmarketsummaries";
+// var url = "https://api.bitso.com/v3/ticker/";
 
 // JSON OBJECTS
 var eth = [];
@@ -13,17 +13,15 @@ var eth_index;
 var usdt_index;
 var btc_index;
 
-request();
-
 function request() {
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
+    xmlhttp.open("GET", url, true);
+    xmlhttp.onload = function () {
         if (this.readyState == 4 && this.status == 200) {
             arr = JSON.parse(this.responseText).result;
             getPairsBothMarkets(arr);
         }
     };
-    xmlhttp.open("GET", url, true);
     xmlhttp.send();
 }
 
@@ -97,7 +95,7 @@ function checkDifference(coin) {
     var USDT_coin = objects[2].Ask;
 
     var res = 1;
- 
+
     // Empieza en BTC
     res = 1 / BTC_coin;
     // Res en coin y se pasa a ETH
