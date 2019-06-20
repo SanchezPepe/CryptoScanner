@@ -10,29 +10,21 @@
     <title>Document</title>
 </head>
 
-<body class="hero is-success is-fullheight" onload="request()">
+<body class="hero is-success is-fullheight" style="background-color:green" onload="request()">
     <section class="section">
         <div class="container">
-            <h2 class="title">CryptoScanner Scan Throught Markets</h2>
+            <h2 class="title">CryptoScanner</h2>
             <div>
+                <p class="subtitle">Cryptocurrency comparision scan throught markets, data gathered from <a href="bittrex.com">Bittrex</a></p>
                 <h2 class="subtitle">Enable CORS Firefox <a href="https://addons.mozilla.org/es/firefox/addon/cross-domain-cors/?src=search" style="color: blue">here</a></h2>
             </div>
-            <h2 id="flag" class="subtitle"><strong></strong></h2>
-            <div class="columns hero is-link">
-                <div class="column">
-                    <p class="subtitle" id="0"></p>
-                </div>
-                <div class="column">
-                    <p class="subtitle" id="1"></p>
-                </div>
-            </div>
-            <div class="columns hero is-info">
-                <div class="column">
-                    <p class="subtitle" id="2"></p>
-                </div>
-                <div class="column">
-                    <p class="subtitle" id="3"></p>
-                </div>
+            <br>
+            <div id="info">
+                <div class="columns hero is-link">
+                    <div class="column">
+                        <p class="subtitle" id="1"></p>
+                    </div>
+
             </div>
         </div>
     </section>
