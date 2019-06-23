@@ -43,7 +43,8 @@ function cleanData(response) {
         });
         // Deja sólo las monedas que tienen más de 1 mercado exepto las de interés
         var pairsOfInterest = ["BTC-ETH", "USD-BTC", "USD-ETH",
-            "USD-USDT", "USDT-BTC", "USDT-ETH"];
+            "USD-USDT", "USDT-BTC", "USDT-ETH"
+        ];
         for (const elem in markets) {
             size = Object.keys(markets[elem]).length;
             if (size == 1 && !pairsOfInterest.includes(Object.values(markets[elem])[0].MarketName)) {
@@ -53,6 +54,7 @@ function cleanData(response) {
         console.log(markets);
         document.getElementById("info").innerHTML = "Success! Fetched: " + Object.keys(markets).length + " cryptocurrencies in 4 different markets";
         // Obtiene los precios del BTC, USD, ETH y USDT
+        //scanMarkets();
     } else {
         console.log("Check response");
     }
@@ -84,195 +86,190 @@ function transaction(base, newCoin) {
 function convert(base, newCoin, balance) {
     //request();
     var grossBalance;
+    var transaction;
     // BUY
-    if (markets[newCoin][base] != undefined) {
-        console.log("BUY");
+    if (markets[newCoin] != undefined && markets[newCoin][base] != undefined) {
+        transaction = "BUY";
         grossBalance = balance / markets[newCoin][base]["Ask"];
     } else {
         // SELL
-        console.log("SELL");
+        transaction = "SELL";
         grossBalance = balance * markets[base][newCoin]["Bid"];
     }
     // BITREX COMMISSION 0.25%
     var fee = grossBalance * (0.0025)
     var newBalance = grossBalance - fee;
-    var result = "Transaction: " + balance + " to: " + newBalance + " " + newCoin + "\n" + "Fee: " + fee + " " + newCoin;
+    var result = transaction + " " + balance + " " + base + " to: " + newBalance + " " + newCoin + ". Fee: " + fee + " " + newCoin;
     console.log(result);
-    balance = [newBalance, newCoin];
+    return newBalance;
 }
 
 function scanMarkets() {
     var max_profit = 0;
-    var base = "";
-    var base2 = "";
-    var coinSize = Object.keys(markets[mkt]).length;
+    var coinKeys;
     var coins = Object.keys(markets);
-    for (const c in coins) {
-        coinSize = Object.keys(markets[c]).length;
-        base = Object.keys(markets[c])[i];
-        for (let i = 0; i < coinSize; i++) {
-
-        }
-    }
+    var originalBalance = 1;
+    var balance, newBalance;
+    coins.forEach(coin => {
+        console.log("=======================================");
+        coinKeys = Object.keys(markets[coin]);
+        coinKeys.forEach(pair => {
+            sellMarkets = coinKeys.filter(c => c != pair);
+            sellMarkets.forEach(sellCoin => {
+                console.log("EVALUATING", pair, coin);
+                balance = convert(pair, coin, originalBalance); // 1 PAIR COIN
+                console.log("EVALUATING", coin, sellCoin);
+                newBalance = convert(coin, sellCoin, balance);
+                console.log("EVALUATING", sellCoin, pair);
+                newBalance = convert(sellCoin, pair, newBalance);
+                console.log("PERCENT CHANGE: ", Math.round((((newBalance/originalBalance)-1)*100) * 10000) / 10000 + "%");
+            });
+        });
+    });
 }
 
-var markets = {}
-
-/**
 var markets = {
-    "BTC": [{
+    "NPXS": {
+        "BTC": {
+            "MarketName": "BTC-NPXS",
+            "High": 9e-8,
+            "Low": 7e-8,
+            "Volume": 521635932.2047428,
+            "Last": 9e-8,
+            "BaseVolume": 41.88774505,
+            "TimeStamp": "2019-06-23T02:28:26.037",
+            "Bid": 8e-8,
+            "Ask": 9e-8,
+            "OpenBuyOrders": 325,
+            "OpenSellOrders": 3420,
+            "PrevDay": 8e-8,
+            "Created": "2018-10-22T00:47:15.047"
+        },
+        "USDT": {
+            "MarketName": "USDT-NPXS",
+            "High": 0.00098,
+            "Low": 0.00082534,
+            "Volume": 6420727.24711742,
+            "Last": 0.00085002,
+            "BaseVolume": 5864.69254432,
+            "TimeStamp": "2019-06-23T02:28:26.037",
+            "Bid": 0.00088327,
+            "Ask": 0.00090274,
+            "OpenBuyOrders": 66,
+            "OpenSellOrders": 87,
+            "PrevDay": 0.00082609,
+            "Created": "2018-12-11T17:05:36.773"
+        },
+        "ETH": {
+            "MarketName": "ETH-NPXS",
+            "High": 0.00000297,
+            "Low": 0.0000028,
+            "Volume": 14135889.1270175,
+            "Last": 0.0000029,
+            "BaseVolume": 40.59138388,
+            "TimeStamp": "2019-06-23T02:28:26.037",
+            "Bid": 0.00000286,
+            "Ask": 0.0000029,
+            "OpenBuyOrders": 28,
+            "OpenSellOrders": 165,
+            "PrevDay": 0.0000028,
+            "Created": "2018-12-06T17:40:19.817"
+        }
+    },
+    "ETH": {
+        "USD": {
+            "MarketName": "USD-ETH",
+            "High": 315,
+            "Low": 300.043,
+            "Volume": 7162.36231964,
+            "Last": 311.047,
+            "BaseVolume": 2203587.62949367,
+            "TimeStamp": "2019-06-23T03:28:22.247",
+            "Bid": 311.063,
+            "Ask": 311.572,
+            "OpenBuyOrders": 1372,
+            "OpenSellOrders": 458,
+            "PrevDay": 307.662,
+            "Created": "2018-06-20T18:16:05.573"
+        },
+        "USDT": {
+            "MarketName": "USDT-ETH",
+            "High": 318.15587667,
+            "Low": 300.50844762,
+            "Volume": 6036.6846848,
+            "Last": 313.18503803,
+            "BaseVolume": 1860797.47437501,
+            "TimeStamp": "2019-06-23T03:28:22.247",
+            "Bid": 313.06822951,
+            "Ask": 313.18813448,
+            "OpenBuyOrders": 901,
+            "OpenSellOrders": 453,
+            "PrevDay": 306.99999999,
+            "Created": "2017-04-20T17:26:37.647"
+        },
+        "BTC": {
+            "MarketName": "BTC-ETH",
+            "High": 0.02934351,
+            "Low": 0.02784999,
+            "Volume": 12002.65296925,
+            "Last": 0.02926598,
+            "BaseVolume": 343.5947418,
+            "TimeStamp": "2019-06-23T03:28:22.247",
+            "Bid": 0.02922909,
+            "Ask": 0.02926599,
+            "OpenBuyOrders": 1796,
+            "OpenSellOrders": 5499,
+            "PrevDay": 0.02840354,
+            "Created": "2015-08-14T09:02:24.817"
+        }
+    },
+    "BTC": {
+        "USD": {
             "MarketName": "USD-BTC",
-            "High": 9310,
-            "Low": 9046.028,
-            "Volume": 472.81950411,
-            "Last": 9271.732,
-            "BaseVolume": 4341132.09754779,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 9260.001,
-            "Ask": 9271.308,
-            "OpenBuyOrders": 3697,
-            "OpenSellOrders": 1160,
-            "PrevDay": 9147.417,
+            "High": 11190,
+            "Low": 10280,
+            "Volume": 1557.99787183,
+            "Last": 10650,
+            "BaseVolume": 16742601.22471711,
+            "TimeStamp": "2019-06-23T03:28:22.247",
+            "Bid": 10639.715,
+            "Ask": 10639.716,
+            "OpenBuyOrders": 3780,
+            "OpenSellOrders": 841,
+            "PrevDay": 10790.882,
             "Created": "2018-05-31T13:24:40.77"
         },
-        {
+        "USDT": {
             "MarketName": "USDT-BTC",
-            "High": 9287.92674341,
-            "Low": 9052.52727907,
-            "Volume": 153.09997176,
-            "Last": 9234.19353377,
-            "BaseVolume": 1403885.5386149,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 9234.19353375,
-            "Ask": 9234.19353377,
-            "OpenBuyOrders": 2421,
-            "OpenSellOrders": 637,
-            "PrevDay": 9159.56241947,
+            "High": 11171.35076857,
+            "Low": 10350,
+            "Volume": 727.17969393,
+            "Last": 10701.4,
+            "BaseVolume": 7817032.29075771,
+            "TimeStamp": "2019-06-23T03:28:22.247",
+            "Bid": 10706.79627239,
+            "Ask": 10716.02422329,
+            "OpenBuyOrders": 2443,
+            "OpenSellOrders": 521,
+            "PrevDay": 10800,
             "Created": "2015-12-11T06:31:40.633"
         }
-    ],
-    "ADA": [{
-            "MarketName": "USD-ADA",
-            "High": 0.09167,
-            "Low": 0.08797,
-            "Volume": 981161.72884365,
-            "Last": 0.08895,
-            "BaseVolume": 87623.05274714,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 0.08831,
-            "Ask": 0.08899,
-            "OpenBuyOrders": 502,
-            "OpenSellOrders": 579,
-            "PrevDay": 0.09011,
-            "Created": "2018-09-05T21:33:55.83"
-        },
-        {
-            "MarketName": "USDT-ADA",
-            "High": 0.09149999,
-            "Low": 0.08760594,
-            "Volume": 877602.68286985,
-            "Last": 0.08850041,
-            "BaseVolume": 78634.04929043,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 0.08825385,
-            "Ask": 0.08858877,
-            "OpenBuyOrders": 486,
-            "OpenSellOrders": 680,
-            "PrevDay": 0.09010877,
-            "Created": "2017-12-29T19:24:39.987"
-        },
-        {
-            "MarketName": "ETH-ADA",
-            "High": 0.00034031,
-            "Low": 0.00032664,
-            "Volume": 937727.09609588,
-            "Last": 0.00033124,
-            "BaseVolume": 312.32946166,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 0.00032904,
-            "Ask": 0.00033111,
-            "OpenBuyOrders": 548,
-            "OpenSellOrders": 1157,
-            "PrevDay": 0.00033882,
-            "Created": "2017-11-28T17:28:32.077"
-        },
-        {
-            "MarketName": "BTC-ADA",
-            "High": 0.00001,
-            "Low": 0.00000945,
-            "Volume": 18041145.68805158,
-            "Last": 0.00000957,
-            "BaseVolume": 176.64820782,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 0.00000956,
-            "Ask": 0.00000958,
-            "OpenBuyOrders": 813,
-            "OpenSellOrders": 7860,
-            "PrevDay": 0.0000098,
-            "Created": "2017-09-29T07:01:58.873"
+    },
+    "USDT": {
+        "USD": {
+          "MarketName": "USD-USDT",
+          "High": 1.00444,
+          "Low": 0.99,
+          "Volume": 569901.03753068,
+          "Last": 0.995,
+          "BaseVolume": 569116.182571,
+          "TimeStamp": "2019-06-23T03:28:22.247",
+          "Bid": 0.99462,
+          "Ask": 0.995,
+          "OpenBuyOrders": 204,
+          "OpenSellOrders": 210,
+          "PrevDay": 1.00098,
+          "Created": "2018-05-31T13:27:08.477"
         }
-    ],
-    "SC": [{
-            "MarketName": "USDT-SC",
-            "High": 0.00315262,
-            "Low": 0.00307451,
-            "Volume": 1790362.53064015,
-            "Last": 0.00313501,
-            "BaseVolume": 5575.28609973,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 0.00311109,
-            "Ask": 0.00314994,
-            "OpenBuyOrders": 92,
-            "OpenSellOrders": 266,
-            "PrevDay": 0.00310201,
-            "Created": "2018-04-23T20:43:33.953"
-        },
-        {
-            "MarketName": "USD-SC",
-            "High": 0.00315,
-            "Low": 0.00307,
-            "Volume": 935523.08223141,
-            "Last": 0.00314,
-            "BaseVolume": 2925.90605661,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 0.00314,
-            "Ask": 0.0032,
-            "OpenBuyOrders": 145,
-            "OpenSellOrders": 260,
-            "PrevDay": 0.00309,
-            "Created": "2018-10-29T22:59:54.19"
-        },
-        {
-            "MarketName": "ETH-SC",
-            "High": 0.00001173,
-            "Low": 0.00001154,
-            "Volume": 2458033.28615521,
-            "Last": 0.00001169,
-            "BaseVolume": 28.59599867,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 0.00001166,
-            "Ask": 0.00001169,
-            "OpenBuyOrders": 102,
-            "OpenSellOrders": 703,
-            "PrevDay": 0.00001173,
-            "Created": "2017-07-14T17:10:07.74"
-        },
-        {
-            "MarketName": "BTC-SC",
-            "High": 3.5e-7,
-            "Low": 3.1e-7,
-            "Volume": 89781245.8274658,
-            "Last": 3.3e-7,
-            "BaseVolume": 29.92728742,
-            "TimeStamp": "2019-06-20T01:49:38.733",
-            "Bid": 3.3e-7,
-            "Ask": 3.4e-7,
-            "OpenBuyOrders": 325,
-            "OpenSellOrders": 8612,
-            "PrevDay": 3.4e-7,
-            "Created": "2017-05-22T21:30:29.16"
-        }
-    ]
+    }
 };
-**/
-//scanMarkets();
