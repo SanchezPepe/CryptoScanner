@@ -31,42 +31,26 @@
                         <h2 class="title">Markets</h2>
                     </div>
                     <div class="column">
-                        <a class="button is-medium is-link is-rounded is-focused is-fullwidth"><strong>Search</strong></a>
+                        <a class="button is-medium is-link is-rounded is-focused is-fullwidth"
+                            onclick="refreshData()"><strong>Refresh data</strong></a>
                     </div>
                 </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th><strong title="Base coin to convert">Base</strong></th>
-                            <th><strong title="New coin">Coin</strong></th>
-                            <th><strong title="Ask/Bid Price">Price</strong></th>
-                            <th><strong title="Balance">Initial balance</strong></th>
-                            <th><strong title="Balance">Final balance</strong></th>
-                            <th><strong title="Bittrex fee: 0.25%">Fee</strong></th>
-                            <th><strong title="Percent change">Change</strong></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>BTC</th>
-                            <td>USD</td>
-                            <td>38211.2123 BTC</td>
-                            <td>38211.2123 BTC</td>
-                            <td class="is-selected">12312.1213 USD</td>
-                            <td>0.12313 USD</td>
-                            <td>2%</td>
-                        </tr>
-                        <tr>
-                            <td>USD</td>
-                            <th>BTC</th>
-                            <td>38211.2123 BTC</td>
-                            <td>38211.2123 BTC</td>
-                            <td>12312.1213 USD</td>
-                            <td>0.12313 USD</td>
-                            <td>2%</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="mkts-container" style="overflow: scroll;">
+                    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+                        <thead style="color: black">
+                            <tr>
+                                <th><strong>Base</strong></th>
+                                <th><strong>Bridge</strong></th>
+                                <th><strong title="Ask/Bid Price">Sell</strong></th>
+                                <th><strong title="Final balance">Final balance</strong></th>
+                                <th><strong title="Percent change">Change</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </section>
