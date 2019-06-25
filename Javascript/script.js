@@ -1,4 +1,4 @@
-var url = "https://api.bittrex.com/api/v1.1/public/getmarketsummaries";
+var url = "https://api.bittrex.coms/api/v1.1/public/getmarketsummaries";
 
 // JSON OBJECTS
 var prices;
@@ -8,14 +8,19 @@ var markets = {};
  * Consume el API REST de Bittrex
  */
 function request() {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", url, true);
-    xmlhttp.onload = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            cleanData(JSON.parse(this.responseText).result);
-        }
-    };
-    xmlhttp.send();
+    try {
+        document.getElementById("info").innerHTML = "Success! Fetched: " + Object.keys(markets).length + " cryptocurrencies in 4 different markets";
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", url, true);
+        xmlhttp.onload = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                cleanData(JSON.parse(this.responseText).result);
+            }
+        };
+        xmlhttp.send();
+    } catch (error) {
+        document.getElementById("info").innerHTML = "Error - API REQUEST: " + error.toString();
+    }
 }
 
 function cleanData(response) {
@@ -31,7 +36,7 @@ function cleanData(response) {
                 markets[name] = {};
             markets[name][pair] = element;
         });
-        // Deja sólo las monedas que tienen más de 1 mercado exepto las de interés
+        // Deja sólo los pares de monedas que tienen más de 1 mercado excepto las de interés
         var pairsOfInterest = ["BTC-ETH", "USD-BTC", "USD-ETH",
             "USD-USDT", "USDT-BTC", "USDT-ETH"
         ];
@@ -71,7 +76,7 @@ function transaction(base, newCoin) {
     }
 }
 
-function convert(base, newCoin, balance) {
+function transaction(base, newCoin, balance) {
     var grossBalance;
     var transaction;
     // BUY
@@ -84,7 +89,7 @@ function convert(base, newCoin, balance) {
         grossBalance = balance * markets[base][newCoin]["Bid"];
     }
     // BITREX COMMISSION 0.25%
-    var fee = grossBalance * (0.0010);
+    var fee = grossBalance * (0.0025);
     var newBalance = grossBalance - fee;
     var result = transaction + " " + balance + " " + base + " to: " + newBalance + " " + newCoin + ". Fee: " + fee + " " + newCoin;
     console.log(result);
@@ -99,20 +104,19 @@ function scanMarkets() {
     var originalBalance = 1;
     var balance, newBalance;
     coins.forEach(coin => {
-        console.log("=======================================");
         coinKeys = Object.keys(markets[coin]);
         coinKeys.forEach(pair => {
             sellMarkets = coinKeys.filter(c => c != pair);
             sellMarkets.forEach(sellCoin => {
-                console.log("EVALUATING", pair, coin);
-                balance = convert(pair, coin, originalBalance); // 1 PAIR COIN
-                console.log("EVALUATING", coin, sellCoin);
-                newBalance = convert(coin, sellCoin, balance);
-                console.log("EVALUATING", sellCoin, pair);
-                newBalance = convert(sellCoin, pair, newBalance);
+                balance = transaction(pair, coin, originalBalance); // 1 PAIR COIN
+                newBalance = transaction(coin, sellCoin, balance);
+                newBalance = transaction(sellCoin, pair, newBalance);
                 change = Math.round((((newBalance / originalBalance) - 1) * 100) * 10000) / 10000;
-                console.log("PERCENT CHANGE: ", change + "%");
+                console.log("PERCENTAGE CHANGE: ", change + "%");
+                console.log("=======================================");
+                //if (Math.abs(change) <= 100 || change > 0) {
                 addRow(pair, coin, sellCoin, round7Digits(newBalance) + " " + pair, round3Digits(change));
+                //}
             });
         });
     });
@@ -125,10 +129,16 @@ function addRow(base, bridge, sell, final, change) {
         "<td>" + base + "</td>" +
         "<td>" + bridge + "</td>" +
         "<td>" + sell + "</td>" +
-        "<td>" + final + "</td>" +
-        "<td>" + change + "% </td>";
-    row.innerHTML = content;
-    table.appendChild(row);
+        "<td>" + final + "</td>";
+    if (change > 0) {
+        content += "<td class='is-success'>" + change + "% </td>";
+        row.innerHTML = content;
+        table.insertBefore(row, table.firstElementChild);
+    } else {
+        content += "<td class='is-danger'>" + change + "% </td>";
+        row.innerHTML = content;
+        table.appendChild(row);
+    }
 }
 
 function refreshData() {
@@ -139,8 +149,8 @@ function refreshData() {
         }
     }, 100);
     setTimeout(function () {
-        scanMarkets();
-    }, 100);
+        request();
+    }, 150);
 
 }
 
@@ -162,7 +172,7 @@ function getPair(pair) {
     return pair.substring(0, index);
 }
 
-function fitMarketsContainer(){
+function fitMarketsContainer() {
     var h = window.innerHeight;
-    document.getElementById("mkts-container").style.height = (h*0.55) + "px";
+    document.getElementById("mkts-container").style.height = (h * 0.50) + "px";
 }
